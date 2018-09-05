@@ -6,6 +6,7 @@ module Kubot
         :environment_variable => "SLACK_API_TOKEN", :required => true
       def execute
         Kubot::Bot.run
+        Kubot::MyServer.run
       end
     end
 

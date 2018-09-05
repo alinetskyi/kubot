@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'clamp', '~> 1.2'
   spec.add_dependency 'slack-ruby-bot', '~> 0.11'
   spec.add_dependency 'celluloid-io', '~> 0.17'
+  spec.add_dependency 'slack-ruby-client'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'
