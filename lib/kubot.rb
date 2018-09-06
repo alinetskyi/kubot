@@ -5,7 +5,8 @@ require 'slack-ruby-bot'
 require 'kubot/version'
 require 'kubot/bot'
 require 'kubot/main'
+require 'kubot/server'
 
 module Kubot
-  # Your code goes here...
+  Kubot::Main.run
 end
