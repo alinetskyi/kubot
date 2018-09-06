@@ -4,6 +4,8 @@ module Kubot
     subcommand "start", "Start the kubot" do
       option "--token", "TOKEN", "Slack api token",
         :environment_variable => "SLACK_API_TOKEN", :required => true
+      option "--channel" "SUPPORT_CHANNEL","Support channel id",
+        :environment_variable => "SLACK_SUPPORT_CHANNEL", :required => true
       def execute
         Kubot::Bot.run
         Kubot::MyServer.run
