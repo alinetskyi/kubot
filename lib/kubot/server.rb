@@ -4,42 +4,53 @@ require 'json'
 module Kubot
   class MyServer < SlackRubyBot::Server
     on 'message' do |client, data|
-      if data.team != 'TCQG7CCMC'
+      if data.team != SLACK_SUPPORT_TEAM
+=begin
         HTTP.post('https://slack.com/api/chat.postMessage', params: {
           text: "#{$channels}",
           channel: 'CCQN7JBHU',
-          token: $teams['TCQG7CCMC'][2]
+          token: $db.get_team_bot_token('TCQG7CCMC')
         })
-        if $channels.key?(data.channel)
+=end
+        if $db.select_support_channel(data.channel) != nil 
           HTTP.post('https://slack.com/api/chat.postMessage', params: { 
-            text: "#{data.channel}:#{data.text}", 
-            channel: $channels[data.channel],
-            token: $teams['TCQG7CCMC'][2]})
+            text: "#{$db.get_team_name(data.team)}: #{data.text}", 
+            channel: $db.select_support_channel(data.channel),
+            token: $db.get_team_bot_token(SLACK_SUPPORT_TEAM)})
         else 
-          rc = JSON.parse(HTTP.post('https://slack.com/api/conversations.create', params: {
-            name: self.get_team_name($teams[data.team][2]).to_s.downcase.delete(' ')+'_support'+Random.rand(100).to_s , 
-            token: $teams['TCQG7CCMC'][1]}))
-          self.set_support_channel(rc, data)
+          JSON.parse(HTTP.post('https://slack.com/api/conversations.create', params: {
+            name: $db.get_team_name(data.team).to_s.downcase.delete(' ')+'_support'+Random.rand(100).to_s , 
+            token: $db.get_team_token(SLACK_SUPPORT_TEAM)}))
+          HTTP.post('https://slack.com/api/chat.postMessage', params: {
+            text: "#{$db.get_team_name(data.team)}: #{data.text}",
+            channel: $db.select_support_channel(data.channel),
+            token: $db.get_team_bot_token(SLACK_SUPPORT_TEAM)})
+          #self.set_support_channel(rc, data)
         end
+=begin
         HTTP.post('https://slack.com/api/chat.postMessage', params: {
         text: "#{rc}",
         channel: 'CCQN7JBHU',
         token: $teams['TCQG7CCMC'][2]
         })
+=end
       else
-        if $channels.has_value?(data.channel) 
-          rc = HTTP.post('https://slack.com/api/chat.postMessage', params: {
+        if $db.select_ask_channel(data.channel) != nil
+          HTTP.post('https://slack.com/api/chat.postMessage', params: {
             text: "#{data.text}",
-            channel: $channels.key(data.channel),
-            token: $teams[$team_channel[$channels.key(data.channel)]][2]
+            channel: $db.select_ask_channel(data.channel),
+            token: $db.get_team_bot_token(data.team)
           })
+=begin
           HTTP.post('https://slack.com/api/chat.postMessage', params: { 
             text: "#{rc}",                                 
-            channel: $channels.key(data.channel),     
-            token: $teams['TCQG7CCMC'][2]})  
+            channel: $channels.key(data.channel),
+            token: $teams['TCQG7CCMC'][2]})
+=end
         end
       end
     end
+=begin
     #Gets teams name 
     def self.get_team_name(token)
       rc = JSON.parse(HTTP.get('https://slack.com/api/team.info', params: {token: token}))
@@ -51,5 +62,6 @@ module Kubot
         $channels[data.channel] = rc['channel']['id']
       end 
     end
+=end
   end
 end

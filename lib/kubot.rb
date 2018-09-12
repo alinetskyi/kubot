@@ -6,9 +6,11 @@ require 'kubot/main'
 require 'kubot/server'
 require 'eventmachine'
 require 'kubot/auth'
+require 'kubot/db'
+require 'kubot/setup'
 require 'faye/websocket'
 require 'http'
-require 'json' 
+require 'json'
 
 module Kubot
   Main.run
