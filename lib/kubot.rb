@@ -11,6 +11,7 @@ require 'kubot/setup'
 require 'faye/websocket'
 require 'http'
 require 'json'
+require 'kubot/bot'
 
 module Kubot
   Main.run
