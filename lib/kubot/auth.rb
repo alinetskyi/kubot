@@ -6,7 +6,6 @@ module Kubot
 =end
   class Auth < Sinatra::Base
     def self.set_credentials(rc)
-      #$teams[rc['team_id']] = [rc['team_name'],rc['access_token'],rc['bot']['bot_access_token']]
       $db.add_team(rc['team_id'],rc['team_name'],rc['access_token'],rc['bot']['bot_access_token'])
     end 
     get '/' do
@@ -18,8 +17,6 @@ module Kubot
         }))
         Auth.set_credentials(rc)
         token = rc['bot']['bot_access_token']
-        #$teams[rc['team_id']] = token
-        #$team_names[rc['team_id']] = rc['access_token']
         team_id = rc['team_id']
         MyServer.new(token: token).start_async
         "Team Successfully Registered #{rc} token #{token}, team: #{team_id}"

@@ -17,12 +17,6 @@ module Kubot
     def add_team(team_id,team_name,access_token,bot_access_token)  
       self.execute("INSERT INTO teams (team_id, team_name, access_token, bot_access_token)
                    VALUES (?,?,?,?);",[team_id,team_name,access_token,bot_access_token])
-=begin 
-                   WHERE NOT EXISTS (select * from teams where team_id = '#{team_id}' 
-                   AND team_name = '#{team_name}' 
-                   AND access_token='#{access_token}' 
-                   AND bot_access_token = '#{bot_access_token}');
-=end
     end
 
     def create_channels_table
@@ -30,14 +24,16 @@ module Kubot
     create table if not exists channels (
       support_channel varchar(30),
       ask_channel varchar(30),
+      support_channel_bot_token varchar(50),
+      ask_channel_bot_token varchar(50),
       UNIQUE(support_channel,ask_channel)
     );
       SQL
     end
 
-    def add_channels(support_channel,ask_channel)
-      self.execute("INSERT INTO channels (support_channel, ask_channel)
-             VALUES (?,?) WHERE not exists (select * from channels where support_channel = '#{support_channel} AND ask_channel = '#{ask_channel}')", [support_channel,ask_channel])
+    def add_channels(support_channel,ask_channel, support_channel_bot_token, ask_channel_bot_token)
+      self.execute("INSERT INTO channels (support_channel, ask_channel,support_channel_bot_token, ask_channel_bot_token)
+             VALUES (?,?,?,?)", [support_channel,ask_channel, support_channel_bot_token, ask_channel_bot_token])
     end
 
     def select_team_by_name(team_name)
@@ -59,11 +55,11 @@ module Kubot
     end
 
     def get_all_bot_tokens
-      tokens = Array.new
+      bt = Array.new
       self.execute("SELECT bot_access_token FROM teams") do |row|
-        tokens.insert(row)
+        bt.push(row)
       end
-      return tokens
+      return bt
     end
 
     def get_team_name(team_id)
@@ -86,6 +82,21 @@ module Kubot
 
     def select_ask_channel(support_channel)
       self.execute("SELECT ask_channel FROM channels WHERE support_channel = '#{support_channel}'") do |row|
+        return row
+      end
+    end
+    def get_channels_table
+      self.execute("SELECT * FROM channels ") do |row|
+        return row
+      end
+    end
+    def get_ask_bot_token(ask_channel)
+      self.execute("SELECT ask_channel_bot_token FROM channels WHERE ask_channel = '#{ask_channel}'") do |row|
+        return row
+      end
+    end
+    def get_support_bot_token(support_channel)
+      self.execute("SELECT support_channel_bot_token FROM channels WHERE support_channel = '#{support_channel}'") do |row|
         return row
       end
     end

@@ -4,12 +4,15 @@ module Kubot
       $db = KubotDB.new "kubot.db" 
       $db.create_channels_table
       $db.create_teams_table
-      bot_tokens = $db.get_all_bot_tokens
-      if bot_tokens != nil
-        bot_tokens.each do |bot_token|
-          MyServer.new(token: bot_token).start_async
-        end 
-      end 
+      begin
+        bots = $db.get_all_bot_tokens
+        puts bots
+        bots.each do |bot|
+          MyServer.new(token: bot[0].to_s).start_async
+        end
+      rescue
+        return nil 
+      end
     end
   end
 end
