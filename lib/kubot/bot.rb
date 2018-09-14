@@ -1,27 +1,17 @@
 module Kubot 
   class Ask < SlackRubyBot::Commands::Base
     help do
-        title 'ask'
-        desc 'By typing ask you can ask our support team some questions'
+        title 'help'
+        desc 'just type whatever you want to get help with and our support team will answer you'
     end
 
-    command 'ask' do |match,client,data|
-      if client.team != SLACK_SUPPORT_TEAM
-        MyServer.ask_question(client)
-      end
-    end 
-    
-    help do
-      title 'ans'
-      desc "If you're from support you should type ans and then start answering the question"
+    match (/^(?<bot>\S*)[\s]*(?<expression>.*)$/) do |client,data,match|
+        if data.team != SLACK_SUPPORT_TEAM
+          MyServer.ask_question(data)
+        else
+          MyServer.answer_question(data)
+        end
     end
-
-    command 'ans' do |match, client, data| 
-      if client.team == SLACK_SUPPORT_TEAM
-        MyServer.answer_question(client)
-      end
-    end
-
   end
 end
 

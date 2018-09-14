@@ -1,13 +1,12 @@
 module Kubot
-=begin
-  $channels = Hash.new
-  $teams = Hash.new
-  $team_channel = Hash.new
-=end
   class Auth < Sinatra::Base
     def self.set_credentials(rc)
-      puts rc
-      $db.add_team(rc['team_id'],rc['team_name'],rc['bot']['bot_user_id'],rc['access_token'],rc['bot']['bot_access_token'])
+      begin
+        Setup.db.add_team(rc['team_id'],rc['team_name'],rc['bot']['bot_user_id'],rc['access_token'],rc['bot']['bot_access_token'])
+        return true
+      rescue
+        return false
+      end
     end 
     get '/' do
       if params.key?('code')
@@ -16,11 +15,13 @@ module Kubot
         client_secret: ENV['SLACK_CLIENT_SECRET'],
         code: params['code']
         }))
-        Auth.set_credentials(rc)
-        token = rc['bot']['bot_access_token']
-        team_id = rc['team_id']
-        MyServer.new(token: token).start_async
-        "Team Successfully Registered #{rc} token #{token}, team: #{team_id}"
+        if Auth.set_credentials(rc)
+          token = rc['bot']['bot_access_token']
+          MyServer.new(token: token).start_async
+          "Team Successfully Registered!"
+        else
+          "Sorry, this team is already registered!"
+        end
       else
         "Hello World"
       end
