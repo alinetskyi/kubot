@@ -7,6 +7,7 @@ module Kubot
     create table if not exists teams (
     team_id varchar(30),
     team_name varchar(30),
+    bot_id varchar(30),
     access_token varchar(50),
     bot_access_token varchar(50),
     UNIQUE(team_id,access_token,bot_access_token)
@@ -14,9 +15,9 @@ module Kubot
       SQL
     end
 
-    def add_team(team_id,team_name,access_token,bot_access_token)  
-      self.execute("INSERT INTO teams (team_id, team_name, access_token, bot_access_token)
-                   VALUES (?,?,?,?);",[team_id,team_name,access_token,bot_access_token])
+    def add_team(team_id,team_name,bot_id,access_token,bot_access_token)  
+      self.execute("INSERT INTO teams (team_id, team_name,bot_id, access_token, bot_access_token)
+                   VALUES (?,?,?,?,?);",[team_id,team_name,bot_id,access_token,bot_access_token])
     end
 
     def create_channels_table
@@ -70,6 +71,12 @@ module Kubot
 
     def get_team_token(team_id)
       self.execute("SELECT access_token FROM teams WHERE team_id = '#{team_id}'") do |row| 
+        return row
+      end
+    end
+
+    def get_bot_id(team_id)
+      self.execute("SELECT bot_id FROM teams WHERE team_id = '#{team_id}'") do |row|
         return row
       end
     end

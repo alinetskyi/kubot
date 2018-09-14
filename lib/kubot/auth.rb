@@ -6,7 +6,8 @@ module Kubot
 =end
   class Auth < Sinatra::Base
     def self.set_credentials(rc)
-      $db.add_team(rc['team_id'],rc['team_name'],rc['access_token'],rc['bot']['bot_access_token'])
+      puts rc
+      $db.add_team(rc['team_id'],rc['team_name'],rc['bot']['bot_user_id'],rc['access_token'],rc['bot']['bot_access_token'])
     end 
     get '/' do
       if params.key?('code')
