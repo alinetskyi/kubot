@@ -26,6 +26,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'slack-ruby-client'
   spec.add_dependency 'http'
   spec.add_dependency 'json'
+  spec.add_dependency 'sinatra'
+  spec.add_dependency 'eventmachine'
+  spec.add_dependency 'sqlite3'
+  spec.add_dependency 'faye'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'rake', '~> 10.0'
