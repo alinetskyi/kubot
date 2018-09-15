@@ -6,11 +6,7 @@ module Kubot
     end
 
     match (/^(?<bot>\S*)[\s]*(?<expression>.*)$/) do |client,data,match|
-        if data.team != SLACK_SUPPORT_TEAM
           MyServer.ask_question(data)
-        else
-          MyServer.answer_question(data)
-        end
     end
   end
 end

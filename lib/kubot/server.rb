@@ -3,6 +3,19 @@ require 'json'
 
 module Kubot
   class MyServer < SlackRubyBot::Server
+
+    on :channel_joined do |client, data|
+      puts "client:",client, "data:", data
+      client.say(text: "Hello, I'm kubot I can help you with any issue.\nJust DM me or add me to the channel and tag me when you want some support!", channel: data.channel.id)
+      #explain how to communicate with Kubot
+    end 
+
+    on :message do |client, data|
+      if data.team == SLACK_SUPPORT_TEAM && data.bot_id.nil? 
+        answer_question(data)
+      end
+    end
+
     def self.answer_question(data)
       channel = format_query(Setup.db.select_ask_channel(data.channel))
       token = format_query(Setup.db.get_ask_bot_token(channel))
@@ -20,9 +33,12 @@ module Kubot
             text: text,
             channel: channel,
             token:  token,
-            as_user: true
+            as_user: true,
+            mrkdwn: true,
+            unfurl_links: true,
+            unfurl_media: true
       }))
-      puts "<<<<<<Sending Message >>>>>>", rc
+      puts "<<<<<<Sending.say>>>>>>", rc
     end
 
     def self.ask_question(data)
