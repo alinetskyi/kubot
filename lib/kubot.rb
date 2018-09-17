@@ -8,10 +8,10 @@ require 'eventmachine'
 require 'kubot/auth'
 require 'kubot/db'
 require 'kubot/setup'
-require 'faye/websocket'
 require 'http'
 require 'json'
 require 'kubot/bot'
+require 'faye/websocket'
 
 module Kubot
   Main.run
