@@ -20,9 +20,21 @@ Or install it yourself as:
 
 ## Usage
 
-Create an app on Slack.
+#### Create an app on Slack.
 
-Setup a bot there and retrive your SLACK_CLIENT_ID and SLACK_CLIENT_SECRET, you also need to know you team id 
+ [Press Build your own app](https://api.slack.com) 
+
+#### Setup a bot and retrive your SLACK_CLIENT_ID and SLACK_CLIENT_SECRET
+
+![Retrive these fields](https://image.ibb.co/dmASCK/app_setup.png)
+
+#### Find out your team id to make it a support team 
+
+[Go to this link](https://api.slack.com/methods/team.info/test)
+
+_Choose your workspace and press Test Method and then you can get your team id from the response_
+
+![Generate a tocken if you don't already have it](https://image.ibb.co/i4mTKz/Deepin_Screenshot_select_area_20180918155451.png)
 
 export SLACK_CLIENT_ID, SLACK_CLIENT_SECRET and SLACK_SUPPORT_TEAM
 ```
@@ -41,7 +53,6 @@ kubot start
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
