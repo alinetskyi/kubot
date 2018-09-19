@@ -26,6 +26,7 @@ module Kubot
         else
           send_message(text, channel,token)
         end
+        send_message("Hang on a minute, let me get an answer for you!",channel,token)
     end
 
     def self.send_message(text, channel,token)
