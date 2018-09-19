@@ -55,6 +55,7 @@ module Kubot
         end
       rescue
         chan_name = format_query(Setup.db.get_team_name(data.team)).downcase.delete(' ')+'_'+get_channel_info(data)
+        if data.team != SLACK_SUPPORT_TEAM
           rc = JSON.parse(HTTP.post('https://slack.com/api/conversations.create', params: {
             name: chan_name.to_s[0,20],
             token: format_query(Setup.db.get_team_token(SLACK_SUPPORT_TEAM))}))
@@ -67,6 +68,7 @@ module Kubot
 
           set_support_channel(rc, data)
           send_message(text,rc['channel']['id'],token)
+        end
       end
     end
 
