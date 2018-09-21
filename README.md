@@ -1,6 +1,6 @@
 # Kubot
 
-Kubot is a Slack support bot that uses Slack API to foward messages from workspaces that are given support to workspace that provides it. It creates a database where all the workspaces registered are stored. And once Kubot is asked a question on channel in a supported workspace a corresponding channel will be created in support workspace and all the messages will be forwarded between this two channels. It's a helpful tool to manage your support workflow.
+Kubot is a Slack support bot that uses Slack API to foward messages from workspaces that are given support to workspace that provides it. It creates a database where all registered workspaces are stored. And once Kubot is asked a question on channel in a supported workspace a corresponding channel will be created in support workspace and all the messages will be forwarded between these two channels. It's a helpful tool to manage your support workflow.
 
 ## Installation
 

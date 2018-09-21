@@ -4,6 +4,7 @@ module Kubot
   SLACK_SUPPORT_TEAM = ENV["SLACK_SUPPORT_TEAM"]
   class Main < Clamp::Command
     subcommand "start", "Start the kubot" do
+      
       def execute
         if SLACK_CLIENT_ID != nil && SLACK_CLIENT_SECRET != nil && SLACK_SUPPORT_TEAM != nil 
           Setup.run
