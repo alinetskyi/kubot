@@ -2,16 +2,37 @@ module Kubot
   SLACK_CLIENT_ID = ENV["SLACK_CLIENT_ID"]
   SLACK_CLIENT_SECRET = ENV["SLACK_CLIENT_SECRET"]
   SLACK_SUPPORT_TEAM = ENV["SLACK_SUPPORT_TEAM"]
+
   class Main < Clamp::Command
     subcommand "start", "Start the kubot" do
       def execute
-        if SLACK_CLIENT_ID != nil && SLACK_CLIENT_SECRET != nil && SLACK_SUPPORT_TEAM != nil 
-          Setup.run
-          run Auth.run!
-        else
-          puts "ERROR: you need to set 3 environment variables:\nSLACK_CLIENT_ID\nSLACK_CLIENT_SECRET\nSLACK_SUPPORT_TEAM"
-          exit(1)
+        %W{SLACK_CLIENT_ID SLACK_CLIENT_SECRET SLACK_SUPPORT_TEAM }.each do |env_var|
+          if ENV[env_var] == '' || ENV[env_var].nil?
+            puts "ERROR: "+ env_var+" is not set!"
+            exit(1)
+          end
         end
+
+          @@db = KubotDB.new "kubot.db"
+          @@db.create_channels_table
+          @@db.create_teams_table
+            begin
+              bots = @@db.get_all_bot_tokens
+              puts bots
+              bots.each do |bot|
+                MyServer.new(token: bot[0].to_s).start_async
+              end
+            rescue
+              return nil
+            end
+          run Auth.run!
+      end
+    end
+
+
+    class << self
+      def db
+        @@db
       end
     end
 
@@ -19,6 +40,5 @@ module Kubot
       puts Kubot::VERSION
       exit(0)
     end
-
   end
 end
