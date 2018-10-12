@@ -23,13 +23,8 @@ RUN chown -R app:app $APP_HOME
 
 USER app
 
-ENV SLACK_CLIENT_ID=''
-#Your client ID here
-ENV SLACK_CLIENT_SECRET=''
-#Your client secret here
-ENV SLACK_SUPPORT_TEAM=''
-#Your slack support team ID here
+ENV RACK_ENV=production
 
-EXPOSE 4567:4567
+EXPOSE 4567
 
 ENTRYPOINT ["bin/kubot","start"]
