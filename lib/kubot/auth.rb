@@ -23,7 +23,7 @@ module Kubot
           "Sorry, this team is already registered!"
         end
       else
-        "Hello World"
+        "Hello, I'm a support bot"
       end
     end
   end
