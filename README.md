@@ -42,6 +42,11 @@ export SLACK_CLIENT_ID='...'
 export SLACK_CLIENT_SECRET='...'
 export SLACK_SUPPORT_TEAM='...'
 ```
+You can also add users that will be instantly added to support channels.
+To do so add their user id's to SLACK_SUPPORT_USERS env variable
+```
+export SLACK_SUPPORT_USERS='USR1 USR2 USR3'
+```
 
 Run kubot
 ```
