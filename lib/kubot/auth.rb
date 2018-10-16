@@ -10,20 +10,20 @@ module Kubot
     end
     get "/" do
       if params.key?("code")
-        rc = JSON.parse(HTTP.post("https://slack.com/api/oauth.access", params: {
+        auth_resp = JSON.parse(HTTP.post("https://slack.com/api/oauth.access", params: {
                                                                           client_id: ENV["SLACK_CLIENT_ID"],
                                                                           client_secret: ENV["SLACK_CLIENT_SECRET"],
                                                                           code: params["code"],
                                                                         }))
-        if Auth.set_credentials(rc)
-          token = rc["bot"]["bot_access_token"]
+        if Auth.set_credentials(auth_resp)
+          token = auth_resp["bot"]["bot_access_token"]
           MyServer.new(token: token).start_async
           "Team Successfully Registered!"
         else
           "Sorry, this team is already registered!"
         end
       else
-        "Hello, I'm a support bot"
+        File.read(File.join('src','index.html'))
       end
     end
   end

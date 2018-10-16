@@ -1,0 +1,3 @@
+#ignore files with .html and .db
+*.db
+*/*/*.html

@@ -56,48 +56,61 @@ module Kubot
       rescue
         chan_name = format_query(Main.db.get_team_name(data.team)).downcase.delete(" ") + "_" + get_channel_info(data)
         if data.team != SLACK_SUPPORT_TEAM
-          rc = JSON.parse(HTTP.post("https://slack.com/api/conversations.create", params: {
+          new_convers_resp = JSON.parse(HTTP.post("https://slack.com/api/conversations.create", params: {
                                                                                     name: chan_name.to_s[0, 20],
                                                                                     token: format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),
                                                                                   }))
-          puts rc
-          JSON.parse(HTTP.post("https://slack.com/api/conversations.invite", params: {
-                                                                               channel: rc["channel"]["id"],
-                                                                               token: format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),
-                                                                               users: format_query(Main.db.get_bot_id(SLACK_SUPPORT_TEAM)),
-                                                                             }))
+          puts new_convers_resp 
 
-          set_support_channel(rc, data)
-          send_message(text, rc["channel"]["id"], token)
+          invite_to_convers(new_convers_resp['channel']['id'],format_query(Main.db.get_bot_id(SLACK_SUPPORT_TEAM)))
+          if !ENV['SLACK_SUPPORT_USERS'].nil? 
+            ENV['SLACK_SUPPORT_USERS'].split.each do |user|
+              invite_to_convers(new_convers_resp['channel']['id'],user)
+            end
+          end
+          set_support_channel(new_convers_resp, data)
+          send_message(text, new_convers_resp["channel"]["id"], token)
         end
       end
     end
 
+
+    def self.invite_to_convers(convers_id, users_id)
+      invite_user_resp = JSON.parse(HTTP.post("https://slack.com/api/conversations.invite", params: {
+        channel: convers_id,
+        token: format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),
+        users: users_id,
+      }))
+      puts "<<<<<<<<<<<<<<<<<<<<<<< Invite bot to new conversation >>>>>>>>>>>>>>>>>>>>>>>>>>", invite_user_resp
+      return invite_user_resp
+    end
+
     def self.share_file_publically(data)
-      rc = JSON.parse(HTTP.post("https://slack.com/api/files.sharedPublicURL", params: {
+      share_file_resp = JSON.parse(HTTP.post("https://slack.com/api/files.sharedPublicURL", params: {
                                                                                  token: format_query(Main.db.get_team_token(data.team)),
                                                                                  file: data.files[0]["id"],
                                                                                }))
-      puts "<<<<<<<<<<<Sharing file>>>>>>>>>", rc
+      puts "<<<<<<<<<<<Sharing file>>>>>>>>>", share_file_resp
+      return share_file_resp
     end
 
     def self.get_user_info(data)
-      rc = JSON.parse(HTTP.get("https://slack.com/api/users.info", params: {
+      user_info_resp = JSON.parse(HTTP.get("https://slack.com/api/users.info", params: {
                                                                      token: format_query(Main.db.get_team_bot_token(data.team)),
                                                                      user: data.user,
                                                                    }))
-      puts "<<<<<<<<<<<Getting user info >>>>>>>>>>>", rc
-      return rc
+      puts "<<<<<<<<<<<Getting user info >>>>>>>>>>>", user_info_resp
+      return user_info_resp
     end
 
     def self.get_channel_info(data)
-      rc = JSON.parse(HTTP.get("https://slack.com/api/channels.info", params: {
+      chann_info_resp = JSON.parse(HTTP.get("https://slack.com/api/channels.info", params: {
                                                                         token: Main.db.get_team_bot_token(data.team),
                                                                         channel: data.channel,
                                                                       }))
-      puts "<<<<<<<<<<<Getting channel info >>>>>>>>>", rc
-      if rc["ok"] == true
-        return rc["channel"]["name"]
+      puts "<<<<<<<<<<<Getting channel info >>>>>>>>>", chann_info_resp
+      if chann_info_resp["ok"] == true
+        return chann_info_resp["channel"]["name"]
       else
         return get_user_info(data)["user"]["name"]
       end
@@ -107,9 +120,9 @@ module Kubot
       return query[0].to_s
     end
 
-    def self.set_support_channel(rc, data)
-      if rc["ok"]
-        Main.db.add_channels(rc["channel"]["id"], data.channel, Main.db.get_team_bot_token(SLACK_SUPPORT_TEAM), Main.db.get_team_bot_token(data.team))
+    def self.set_support_channel(response, data)
+      if response["ok"]
+        Main.db.add_channels(response["channel"]["id"], data.channel, Main.db.get_team_bot_token(SLACK_SUPPORT_TEAM), Main.db.get_team_bot_token(data.team))
       end
     end
   end
