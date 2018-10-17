@@ -17,7 +17,7 @@ module Kubot
                                                                         }))
         if Auth.set_credentials(auth_resp)
           token = auth_resp["bot"]["bot_access_token"]
-          MyServer.new(token: token).start_async
+          KubotServer.new(token: token).start_async
           "Team Successfully Registered!"
         else
           "Sorry, this team is already registered!"

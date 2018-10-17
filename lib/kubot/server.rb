@@ -1,8 +1,10 @@
 require "http"
 require "json"
+require "logger"
 
 module Kubot
-  class MyServer < SlackRubyBot::Server
+  class KubotServer < SlackRubyBot::Server
+    @logger = Logger.new(STDOUT)
     on :channel_joined do |client, data|
       puts "client:", client, "data:", data
       client.say(text: "Hello, I'm kubot I can help you with any issue.\nJust DM me or add me to the channel and tag me when you want some support!",
@@ -23,7 +25,7 @@ module Kubot
       text = data.text.split("> ").last || "I've found an answer for you"
       if !data.files.nil?
         send_message(text + "\n_Kubot is sharing a file with you:_" + "\n#{data.files[0]["permalink_public"]}", channel, token)
-        share_file_publically(data)
+        share_file_pub(data)
       else
         send_message(text, channel, token)
       end
@@ -31,7 +33,7 @@ module Kubot
 
     # Makes api call chat.postMessage
     def self.send_message(text, channel, token)
-      rc = JSON.parse(HTTP.post("https://slack.com/api/chat.postMessage", params: {
+      post_msg_resp = JSON.parse(HTTP.post("https://slack.com/api/chat.postMessage", params: {
                                                                             text: text,
                                                                             channel: channel,
                                                                             token: token,
@@ -40,7 +42,7 @@ module Kubot
                                                                             unfurl_links: true,
                                                                             unfurl_media: true,
                                                                           }))
-      puts "<<<<<<Sending.say>>>>>>", rc
+      @logger.debug("KubotServer#send_message: "+ post_msg_resp.to_s)
     end
 
     # Redirects message to support team workspace including links for attachments 
@@ -51,7 +53,7 @@ module Kubot
         channel = format_query(Main.db.select_support_channel(data.channel))
         if !data.files.nil?
           send_message(text + "\n#{data.files[0]["permalink_public"]}", channel, token)
-          share_file_publically(data)
+          share_file_pub(data)
         else
           send_message(text, channel, token)
         end
@@ -61,11 +63,12 @@ module Kubot
           new_convers_resp = create_convers(chan_name.to_s[0,20],format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)))
           if !new_convers_resp['ok']
             new_convers_resp = join_convers(chan_name.to_s[0,20],format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)))
+          else
+            invite_to_convers(new_convers_resp['channel']['id'],format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),format_query(Main.db.get_bot_id(SLACK_SUPPORT_TEAM)))
           end
           ENV['SLACK_SUPPORT_USERS'].split.each do |user|
             invite_to_convers(new_convers_resp['channel']['id'],format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),user)
           end
-          invite_to_convers(new_convers_resp['channel']['id'],format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),format_query(Main.db.get_bot_id(SLACK_SUPPORT_TEAM)))
           set_support_channel(new_convers_resp, data)
           send_message(text, new_convers_resp["channel"]["id"], token)
         end
@@ -77,7 +80,7 @@ module Kubot
         name: name,
         token: token,
         }))
-      puts "<<<<<<<<<<<<<< Creating new conversation >>>>>>>>>>>>>>>>>>>>>>>", new_convers_resp
+      @logger.debug("KubotServer#create_convers: " + new_convers_resp.to_s)
       return new_convers_resp
     end
 
@@ -86,7 +89,7 @@ module Kubot
       name: name,
       token: token,
 }))
-      puts "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Joining already existing support channel >>>>>>>>>>>>>>>>>>>>>>>>>>>", join_existing_convers
+      @logger.debug("KubotServer#join_convers: "+join_existing_convers.to_s)
       return join_existing_convers
     end
 
@@ -97,17 +100,17 @@ module Kubot
         token: token, 
         users: users_id,
       }))
-      puts "<<<<<<<<<<<<<<<<<<<<<<< Invite bot to new conversation >>>>>>>>>>>>>>>>>>>>>>>>>>", invite_user_resp
+      @logger.debug("KubotServer#invite_to_convers: " + invite_user_resp.to_s)
       return invite_user_resp
     end
 
     # Makes attachment publically accessible to be able to share it with support
-    def self.share_file_publically(data)
+    def self.share_file_pub(data)
       share_file_resp = JSON.parse(HTTP.post("https://slack.com/api/files.sharedPublicURL", params: {
                                                                                  token: format_query(Main.db.get_team_token(data.team)),
                                                                                  file: data.files[0]["id"],
                                                                                }))
-      puts "<<<<<<<<<<<Sharing file>>>>>>>>>", share_file_resp
+      @logger.debug("KubotServer#share_file_pub: " + share_file_resp.to_s)
       return share_file_resp
     end
 
@@ -117,7 +120,7 @@ module Kubot
                                                                      token: format_query(Main.db.get_team_bot_token(data.team)),
                                                                      user: data.user,
                                                                    }))
-      puts "<<<<<<<<<<<Getting user info >>>>>>>>>>>", user_info_resp
+      @logger.debug("KubotServer#get_user_info: " + user_info_resp.to_s)
       return user_info_resp
     end
 
@@ -127,7 +130,7 @@ module Kubot
                                                                         token: Main.db.get_team_bot_token(data.team),
                                                                         channel: data.channel,
                                                                       }))
-      puts "<<<<<<<<<<<Getting channel info >>>>>>>>>", chann_info_resp
+      @logger.debug("KubotServer#get_channel_info: "+ chann_info_resp.to_s)
       if chann_info_resp["ok"] == true
         return chann_info_resp["channel"]["name"]
       else

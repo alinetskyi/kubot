@@ -27,14 +27,18 @@ module Kubot
       ask_channel varchar(30),
       support_channel_bot_token varchar(50),
       ask_channel_bot_token varchar(50),
-      UNIQUE(support_channel,ask_channel)
+      UNIQUE(support_channel)
     );
       SQL
     end
 
     def add_channels(support_channel, ask_channel, support_channel_bot_token, ask_channel_bot_token)
       self.execute("INSERT INTO channels (support_channel, ask_channel,support_channel_bot_token, ask_channel_bot_token)
-             VALUES (?,?,?,?)", [support_channel, ask_channel, support_channel_bot_token, ask_channel_bot_token])
+             VALUES (?,?,?,?) ON CONFLICT (support_channel) DO UPDATE SET ask_channel=(?)", [support_channel, ask_channel, support_channel_bot_token, ask_channel_bot_token, ask_channel])
+    end
+
+    def update_ask_channel(support_channel,ask_channel)
+      self.execute("UPDATE channels SET ask_channel = (?) WHERE support_channel = (?)",[ask_channel,support_channel])
     end
 
     def select_team_by_name(team_name)
@@ -64,7 +68,7 @@ module Kubot
     end
 
     def get_team_name(team_id)
-      self.execute("Select team_name FROM teams WHERE team_id = (?)", [team_id]) do |row|
+      self.execute("SELECT team_name FROM teams WHERE team_id = (?)", [team_id]) do |row|
         return row
       end
     end

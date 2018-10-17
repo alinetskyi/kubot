@@ -20,7 +20,7 @@ module Kubot
               bots = @@db.get_all_bot_tokens
               puts bots
               bots.each do |bot|
-                MyServer.new(token: bot[0].to_s).start_async
+                KubotServer.new(token: bot[0].to_s).start_async
               end
             rescue
               return nil
