@@ -43,11 +43,12 @@ module Kubot
                                                                             unfurl_media: true,
                                                                           }))
       @logger.debug("KubotServer#send_message: "+ post_msg_resp.to_s)
+      return post_msg_resp
     end
 
     # Redirects message to support team workspace including links for attachments 
     def self.ask_question(data)
-      text = "#{format_query(Main.db.get_team_name(data.team))}" + "@#{get_user_info(data)["user"]["real_name"]}: #{data.text.split(">").last}"
+      text = "_#{format_query(Main.db.get_team_name(data.team))}" + "@#{get_user_info(data)["user"]["real_name"]}_: #{data.text.split(">").last}"
       token = format_query(Main.db.get_team_bot_token(SLACK_SUPPORT_TEAM))
       begin
         channel = format_query(Main.db.select_support_channel(data.channel))
@@ -66,12 +67,19 @@ module Kubot
           else
             invite_to_convers(new_convers_resp['channel']['id'],format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),format_query(Main.db.get_bot_id(SLACK_SUPPORT_TEAM)))
           end
-          ENV['SLACK_SUPPORT_USERS'].split.each do |user|
-            invite_to_convers(new_convers_resp['channel']['id'],format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),user)
-          end
           set_support_channel(new_convers_resp, data)
           send_message(text, new_convers_resp["channel"]["id"], token)
         end
+      end
+    end
+
+    def self.invite_support_users(new_convers_resp)
+      begin
+        ENV['SLACK_SUPPORT_USERS'].split.each do |user|
+            invite_to_convers(new_convers_resp['channel']['id'],format_query(Main.db.get_team_token(SLACK_SUPPORT_TEAM)),user)
+        end
+      rescue
+        @logger.error("SLACK_SUPPORT_USERS are set incorrectly")
       end
     end
 

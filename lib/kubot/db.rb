@@ -37,10 +37,6 @@ module Kubot
              VALUES (?,?,?,?) ON CONFLICT (support_channel) DO UPDATE SET ask_channel=(?)", [support_channel, ask_channel, support_channel_bot_token, ask_channel_bot_token, ask_channel])
     end
 
-    def update_ask_channel(support_channel,ask_channel)
-      self.execute("UPDATE channels SET ask_channel = (?) WHERE support_channel = (?)",[ask_channel,support_channel])
-    end
-
     def select_team_by_name(team_name)
       self.execute("SELECT * FROM teams WHERE team_name = (?)", [team_name]) do |row|
         return row

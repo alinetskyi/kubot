@@ -1,0 +1,19 @@
+FROM ruby:2.5-alpine3.8
+
+ENV APP_HOME=/home/kubot
+
+COPY . $APP_HOME
+
+RUN apk add sqlite git build-base ruby-dev sqlite-libs lua-sql-sqlite3 sqlite-dev openssl-dev 
+
+WORKDIR $APP_HOME
+
+RUN bundle install
+
+RUN rspec
+
+ENV RACK_ENV=production 
+
+EXPOSE 4567
+
+ENTRYPOINT ["bin/kubot","start"]

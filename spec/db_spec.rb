@@ -6,7 +6,7 @@ RSpec.describe Kubot::KubotDB do
   end
 
   after(:all) do
-    File.delete("/home/r1c2/work/kubot/test.db") if File.exist?("/home/r1c2/work/kubot/test.db")
+    File.delete("test.db") if File.exist?("test.db")
   end
 
   it "creates team table" do
@@ -59,21 +59,21 @@ RSpec.describe Kubot::KubotDB do
   it 'gets bot id with team id' do
     expect(@db.get_bot_id(@team[0])[0].to_s).to eq(@team[2])
   end
-  it 'gets support channel id with ask channel id' do
-    expect(@db.select_support_channel(@channels[1])[0].to_s).to eq(@channels[0])
-  end
+  #it 'gets support channel id with ask channel id' do
+  #  expect(@db.select_support_channel(@channels[1])[0].to_s).to eq(@channels[0])
+  #end
 
-  it 'gets ask channel id with support id' do
-    expect(@db.select_ask_channel(@channels[0])[0].to_s).to eq(@channels[1])
-  end
+  #it 'gets ask channel id with support id' do
+  #  expect(@db.select_ask_channel(@channels[0])[0].to_s).to eq(@channels[1])
+  #end
 
-  it 'outputs the whole channels table' do
-    expect(@db.get_channels_table).to eq(@channels)
-  end
+  #it 'outputs the whole channels table' do
+  #  expect(@db.get_channels_table).to eq(@channels)
+  #end
 
-  it 'gets ask bot token with ask channel id' do
-    expect(@db.get_ask_bot_token("ask")[0].to_s).to eq(@channels[3])
-  end
+  #it 'gets ask bot token with ask channel id' do
+  #  expect(@db.get_ask_bot_token("ask")[0].to_s).to eq(@channels[3])
+  #end
 
   it 'gets support bot token with support channel id' do
     expect(@db.get_support_bot_token("supp")[0].to_s).to eq(@channels[2])

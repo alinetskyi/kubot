@@ -58,6 +58,7 @@ kubot start
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
+**NEVER RUN TESTS WHEN YOU ALREADY HAVE A DATABASE WITH TOKENS! CREATE A BACKUP FIRST BECAUSE IT WILL GET DELETED!**
 
 ## Contributing
 

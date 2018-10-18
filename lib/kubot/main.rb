@@ -8,8 +8,7 @@ module Kubot
       def execute
         %W{SLACK_CLIENT_ID SLACK_CLIENT_SECRET SLACK_SUPPORT_TEAM }.each do |env_var|
           if ENV[env_var] == '' || ENV[env_var].nil?
-            puts "ERROR: "+ env_var+" is not set!"
-            exit(1)
+            raise RuntimeError.new("ERROR: "+ env_var+" is not set!")
           end
         end
 
